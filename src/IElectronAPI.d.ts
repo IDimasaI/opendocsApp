@@ -1,7 +1,8 @@
 export interface IElectronAPI {
     closeWindow(): void;
-    setTitle: (title: string) => void,
-    createFile: (filename: string, text: string) => Promise<string>
+    createFile: (filename: string, text: string) => Promise<string>;
+    OpenFolder_Dialog: () => Promise<{ canceled: boolean, path: string, dir: string[] }>;
+    OpenExternalFile: (filename: string, path: string) => Promise<string>;
 }
 
 declare global {

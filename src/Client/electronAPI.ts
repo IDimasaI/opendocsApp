@@ -1,10 +1,24 @@
-export async function createFile(name: string, text: string) {
-    const data = await window.electronAPI.createFile(name, text);
+/**
+ * 
+ * @param filename название файла. 
+ * @param text содержимое
+ * @example
+ * createFile('Doc/test.txt', 'Hello World!')
+ * @description Файлы создаются в ресурсах
+ */
+export async function createFile(filename: string, text: string) {
+    const data = await window.electronAPI.createFile(filename, text);
     console.log(data);
 }
-export async function setTitle(text: string) {
-    window.electronAPI.setTitle(text);
-}
+
 export function closeWindow() {
     window.electronAPI.closeWindow();
+}
+
+export function OpenFolder_Dialog() {
+    return window.electronAPI.OpenFolder_Dialog();
+}
+
+export function OpenExternalFile(filename: string, path: string) {
+    return window.electronAPI.OpenExternalFile(filename, path);
 }

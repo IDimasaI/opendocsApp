@@ -3,15 +3,29 @@
 
 <head>
   <link href="./src/index.css" rel="stylesheet">
-  <meta charset="UTF-8" /><script type="module" src="/src/renderer.ts"></script>
+  <meta charset="UTF-8" />
+  <script type="module" src="/src/renderer.ts"></script>
+  <script type="module">
+
+  </script>
   <title></title>
 </head>
 
 <body>
 
-  <div class="titlebar"></div>
-      <div id="app"></div>
-      
+  <div class="titlebar" id="Header_nav">
+    <div class="grid grid-cols-3 w-full">
+      <div id="Header_nav-right"></div>
+      <p class="text-center"></p>
+      <button onclick="window.electronAPI.closeWindow()"
+        class=" absolute top-0 right-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        style="app-region: no-drag">X</button>
+    </div>
+  </div>
+  <div id="app"></div>
+  <div id="status_bar"
+    style="position: absolute; bottom: 0; left: 0; right: 0; height: 20px; width: fit-content;; background-color: black; color: white;">
+  </div>
 </body>
 
 </html>

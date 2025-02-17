@@ -1,23 +1,17 @@
 import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
-import { createFile } from './FApis';
+import { createFile, OpenExternalFile, OpenFolder_Dialog } from './FApis';
+import fs from 'fs';
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
 }
-function handleSetTitle(event: { sender: any; }, title: string) {
-  const webContents = event.sender
-  const win = BrowserWindow.fromWebContents(webContents)
-  console.log(title);
-  win.setTitle(title)
-}
 
 const createWindow = () => {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 600,
-    height: 400,
+    width: 800,
+    height: 600,
     frame: false,
     show: true,
     titleBarStyle: 'hidden',
@@ -27,22 +21,18 @@ const createWindow = () => {
     },
   });
 
-  // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  // Open the DevTools.
   mainWindow.webContents.openDevTools();
-  //Прослушивание url
- 
-  ipcMain.on('close-window', () => {
-    mainWindow.close();
-  })
-  ipcMain.on('set-title', handleSetTitle);
+
+  ipcMain.handle('OpenFolder_Dialog', (event) => { return OpenFolder_Dialog() });
+  ipcMain.on('close-window', () => { mainWindow.close(); })
   ipcMain.handle('create-file', (event, filename, text) => { return createFile(filename, text) });
+  ipcMain.handle('OpenExternalFile', (event, filename, path) => { return OpenExternalFile(filename, path) });
 };
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
