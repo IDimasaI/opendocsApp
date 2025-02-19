@@ -14,6 +14,9 @@
         <section>
             <div v-html="openedFile" id="Docs_panel"></div>
         </section>
+        <div>
+            <RouterLink to="/about">About</RouterLink>
+        </div>
     </div>
 </template>
 <script lang="ts" setup>
@@ -22,7 +25,7 @@ import { OpenFolder_Dialog } from '../electronAPI';
 import { useRoute } from 'vue-router';
 import MarkdownParser from '../utils/MarkdownParser';
 import '../../assets/css/Doc.css'
-import { statusbar } from '../utils/status_bar_content';
+import { useStatusBar } from '../utils/status_bar_content';
 const parser = new MarkdownParser({
     tags: {},
     sanitize: true
@@ -32,11 +35,11 @@ const path = ref('')
 const openedFile = ref('');
 const route = useRoute();
 
-
+const test = ref(1)
 
 
 onMounted(async () => {
-    await statusbar(openedFile, 'Docs_panel');
+    useStatusBar([openedFile], 'Docs_panel');
 });
 
 const Dir = async () => {

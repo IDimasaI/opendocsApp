@@ -18,6 +18,7 @@ const createWindow = () => {
     ...(process.platform !== 'darwin' ? { titleBarOverlay: false } : {}),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegrationInWorker: true,
     },
   });
 
