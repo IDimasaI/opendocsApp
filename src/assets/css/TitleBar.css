@@ -1,0 +1,38 @@
+/* Titlebar */
+.titlebar {
+    position: fixed;
+    width: 100%;
+    height: var(--height-navbar);
+    background: var(--bg-color-navbar);
+    color: white;
+    display: flex;
+    justify-content: center;
+    app-region: drag;
+}
+
+#Header_nav-left {}
+
+#Header_nav-center {}
+
+#Header_nav-center-content {
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
+#Header_nav-right {
+    display: flex;
+    justify-content: space-between;
+}
+
+#Header_nav-right>#separatorButtons {
+    width: calc(138px / var(--zoom-factor, 1));
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    text-align: center;
+    z-index: 3000;
+    -webkit-app-region: no-drag;
+    height: auto
+}

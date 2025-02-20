@@ -1,8 +1,7 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
+import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import { createFile, OpenExternalFile, OpenFolder_Dialog } from './FApis';
-import fs from 'fs';
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
@@ -15,7 +14,14 @@ const createWindow = () => {
     frame: false,
     show: true,
     titleBarStyle: 'hidden',
-    ...(process.platform !== 'darwin' ? { titleBarOverlay: false } : {}),
+    titleBarOverlay: {
+      color: 'rgba(0, 0, 0, 0.0)',
+      symbolColor: '#74b1be',
+      height: 35
+    },
+
+    ...(process.platform !== 'darwin' ? {} : {}),
+
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegrationInWorker: true,
@@ -28,17 +34,46 @@ const createWindow = () => {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`));
   }
 
-  mainWindow.webContents.openDevTools();
 
+  // Открытие инструментов разработчика при нажатии F12
+  const menu = new Menu()
+  menu.append(new MenuItem({
+    label: 'Electron',
+    submenu: [{
+      role: 'help',
+      accelerator: 'F12',
+      click: () => { mainWindow.webContents.openDevTools() }
+    }]
+  }))
+
+  Menu.setApplicationMenu(menu)
+};
+
+// Регистация обработчиков для моста контекстов
+function ipcMainHandlers() {
+  // Однонаправленные события, ничего не возвращают
+  ipcMain.on('close-window', () => { app.quit() });
+
+  // Асинхронные события, возвращают промис
   ipcMain.handle('OpenFolder_Dialog', (event) => { return OpenFolder_Dialog() });
-  ipcMain.on('close-window', () => { mainWindow.close(); })
   ipcMain.handle('create-file', (event, filename, text) => { return createFile(filename, text) });
   ipcMain.handle('OpenExternalFile', (event, filename, path) => { return OpenExternalFile(filename, path) });
-};
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+}
+
+// Запуск функций когда приложение готово
+app.whenReady().then(() => {
+  const { session } = require('electron');
+
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    details.responseHeaders['Access-Control-Allow-Origin'] = ['*'];
+    callback({ responseHeaders: details.responseHeaders });
+  });
+  createWindow();
+  ipcMainHandlers();
+  
+});
+
+
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

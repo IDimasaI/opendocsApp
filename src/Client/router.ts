@@ -1,6 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from './Pages/index.vue';
-
+declare module 'vue-router' {
+    interface RouteMeta {
+        title: string;
+    }
+}
 const router = createRouter({
     history: createWebHistory('/'),
     routes: [
@@ -19,6 +23,14 @@ const router = createRouter({
                 title: 'About'
             },
             component: () => import('./Pages/about.vue') // Оберните import в функцию, чтобы вернуть обещание
+        },
+        {
+            path: '/Docs/:page?',
+            name: 'Docs',
+            meta: {
+                title: 'Docs'
+            },
+            component: () => import('./Pages/docs.vue')
         }
     ]
 });

@@ -2,9 +2,7 @@
 import { createApp, defineComponent } from 'vue';
 import head from './_headTemplate.vue'
 import router from '../../router';
-defineComponent({
-    name: 'Head'
-})
+import '../../../assets/css/TitleBar.css'
 createApp(head).use(router).mount('#Header_nav');
 </script>
 <template>

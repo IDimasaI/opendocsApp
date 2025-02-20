@@ -1,8 +1,8 @@
 <template>
     <section>
-        <header>
+        <div>
             <Head v-once/>
-        </header>
+        </div>
         <main>
             <RouterView />
         </main>

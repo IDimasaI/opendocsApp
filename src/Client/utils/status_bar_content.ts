@@ -5,7 +5,7 @@ let closeTimeout: number | undefined;
 
 const openUrlTitle = (event: Event) => {
     const statusBar = document.getElementById('status_bar');
-    if (statusBar && event.target instanceof HTMLAnchorElement && event.target.href) {
+    if (statusBar && event.target instanceof HTMLAnchorElement) {
         statusBar.textContent = event.target.href;
         statusBar.style.opacity = '1';
         if (closeTimeout) {
@@ -25,13 +25,13 @@ const closeUrlTitle = () => {
 };
 
 const handleMouseOver = (event: Event) => {
-    if (event.target instanceof HTMLAnchorElement) {
+    if (event.target instanceof HTMLAnchorElement && event.target.href) {
         openUrlTitle(event);
     }
 };
 
 const handleMouseOut = (event: Event) => {
-    if (event.target instanceof HTMLAnchorElement) {
+    if (event.target instanceof HTMLAnchorElement && event.target.href) {
         closeUrlTitle();
     }
 };

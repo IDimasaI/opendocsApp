@@ -2,7 +2,11 @@
 <html>
 
 <head>
+  <meta http-equiv="Content-Security-Policy" content="default-src *; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data:;">
+
   <link href="./src/index.css" rel="stylesheet">
+  <link href="./src/assets/css/tailwind.css" rel="stylesheet">
+
   <meta charset="UTF-8" />
   <script type="module" src="/src/renderer.ts"></script>
   <script type="module">
@@ -12,17 +16,19 @@
 </head>
 
 <body>
-  
-  <div class="titlebar" id="Header_nav">
-    <div class="grid grid-cols-3 w-full">
-      <div id="Header_nav-right"></div>
-      <p class="text-center"></p>
-      <button onclick="window.electronAPI.closeWindow()"
-        class=" absolute top-0 right-0 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        style="app-region: no-drag">X</button>
+  <header>
+    <div class="titlebar" id="Header_nav">
+      <div class="grid grid-cols-3 items-center">
+        <div id="Header_nav-left"></div>
+        <div id="Header_nav-center" class="text-center" ></div>
+        <div id="Header_nav-right" class="grid grid-cols-2">
+          <div id="rightButtons" class="w-full"></div>
+          <div id="separatorButtons"></div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div id="app"></div>
+  </header>
+  <div id="app" class="bg-white"></div>
   <div id="status_bar" class="status_bar">
   </div>
 </body>
