@@ -7,6 +7,7 @@ createSSRApp(App)
     .use(router)
     .use(history)
     .provide(config, initConfig('AppConfig', {
-        position: "right"
+        position: "right",
+        baseOpen: true
     }))
     .mount(`#app`);

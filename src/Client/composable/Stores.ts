@@ -1,7 +1,8 @@
 import { inject, provide, Ref, ref, watchEffect } from "vue";
 
 type config={
-    position: string
+    position: string,
+    baseOpen: boolean
 }
 
 export const config = Symbol();

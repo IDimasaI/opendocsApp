@@ -16,11 +16,12 @@ import { useConfig } from './Client/composable/Stores';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { addListenerHistory_Mouse, useHistory } from './Client/composable/history';
 const config = useConfig();
-const show_panel = ref(false)
+const show_panel = ref(config.value.baseOpen);
 addListenerHistory_Mouse();
 onMounted(() => {
     const side = document.getElementById(`${config.value.position}_side`);
     const resizable_panel = document.getElementById('resizable_panel');
+    const center=document.getElementById('app');
     let old_width = resizable_panel.style.width;
     const observer = new MutationObserver(() => {
         if (resizable_panel.style.width !== old_width) {
@@ -28,11 +29,13 @@ onMounted(() => {
             if (old_width == '100px') {
                 show_panel.value = false
             }
+            center.style.width = `calc(100% - ${old_width})`;
         }
     });
     observer.observe(resizable_panel, { attributes: true });
     side.style.height = '100%';
     side.style.minWidth = '10px';
+    side.classList.add('no-drag');
     side.addEventListener('mouseover', () => {
         show_panel.value = true
     })
@@ -43,7 +46,4 @@ onMounted(() => {
         observer.disconnect();
     })
 })
-watch(config, () => {
-    console.log(config.value);
-}, { deep: true })
 </script>

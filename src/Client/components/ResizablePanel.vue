@@ -2,7 +2,7 @@
     <div class="flex h-screen">
         <template v-if="isRight">
             <div class="resizer" @mousedown="startResize" @mouseup="stopResize"></div>
-            <div class="panel flex flex-col gap-2 p-4 app-drag justify-between" id="resizable_panel"
+            <div class="panel flex flex-col gap-2 app-drag justify-between" id="resizable_panel"
                 :style="{ width: `${panelWidth}px` }">
                 <slot></slot>
             </div>
