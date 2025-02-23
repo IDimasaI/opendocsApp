@@ -41,7 +41,7 @@
                     Поменять положение(DEV)
                   </button>
                   <button @click="config.baseOpen = !config.baseOpen">
-                    Начальное состояние2: {{ config.baseOpen ? 'открыто' : 'закрыто' }}
+                    Начальное состояние: {{ config.baseOpen ? 'открыто' : 'закрыто' }}
                   </button>
                 </div>
               </TransitionGroup>
