@@ -13,7 +13,7 @@ body {
 }
 
 :root {
-  --height-navbar: env(titlebar-area-height);
+  --height-navbar: 0px;
   --dark-bg-color: #2f3241;
   --bg-color-navbar: var(--dark-bg-color);
   --zoom-factor: 1;
@@ -33,6 +33,10 @@ body {
 
 .no-drag * {
   app-region: no-drag;
+}
+
+.app-drag  {
+  app-region: drag;
 }
 
 #app {

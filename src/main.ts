@@ -13,20 +13,17 @@ const createWindow = () => {
     height: 600,
     frame: false,
     show: true,
-    titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: 'rgba(0, 0, 0, 0.0)',
-      symbolColor: '#74b1be',
-      height: 35
-    },
+    titleBarOverlay:false,
 
-    ...(process.platform !== 'darwin' ? {} : {}),
+    ...(process.platform !== 'darwin' ? { } : {}),
 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegrationInWorker: true,
     },
   });
+
+  
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -53,6 +50,9 @@ const createWindow = () => {
 function ipcMainHandlers() {
   // Однонаправленные события, ничего не возвращают
   ipcMain.on('close-window', () => { app.quit() });
+  ipcMain.on('hide-window', () => { BrowserWindow.getFocusedWindow()?.minimize() });
+  ipcMain.on('maximize/unmaximize-window', () => { BrowserWindow.getFocusedWindow()?.isMaximized() ? BrowserWindow.getFocusedWindow()?.unmaximize() : BrowserWindow.getFocusedWindow()?.maximize(); });
+
 
   // Асинхронные события, возвращают промис
   ipcMain.handle('OpenFolder_Dialog', (event) => { return OpenFolder_Dialog() });

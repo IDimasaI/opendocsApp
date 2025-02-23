@@ -1,9 +1,7 @@
 <template>
     <div class="flex flex-row text-left">
-        <Teleport to="#Header_nav-left" defer>
-            <button @click="getManifestDocsInApi()">Открыть список</button>
-        </Teleport>
-        <Title v-memo="''">Docs</Title>
+        
+        
         <div class="flex flex-col items-start w-64">
             <template v-for="file in files">
                 <button @click="getDocsInApi(file.url)" :style="`${CurrentPath === file.url ? 'color: red' : ''}`">{{

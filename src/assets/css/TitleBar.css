@@ -1,38 +1,37 @@
 /* Titlebar */
-.titlebar {
-    position: fixed;
+.hover_window {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    height: var(--height-navbar);
-    background: var(--bg-color-navbar);
-    color: white;
-    display: flex;
-    justify-content: center;
+    height: 10px;
     app-region: drag;
 }
 
-#Header_nav-left {}
-
-#Header_nav-center {}
-
-#Header_nav-center-content {
-    max-width: 100%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis
+#center {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: calc(100% - 10px);
 }
 
-#Header_nav-right {
-    display: flex;
-    justify-content: space-between;
+.control_panel {}
+
+.control_panel>* {
+    app-region: no-drag;
 }
 
-#Header_nav-right>#separatorButtons {
-    width: calc(138px / var(--zoom-factor, 1));
-    display: flex;
-    flex-grow: 0;
-    flex-shrink: 0;
+.buttonsContainer>* {
     text-align: center;
-    z-index: 3000;
-    -webkit-app-region: no-drag;
-    height: auto
+}
+
+.border-black {
+    border-color: #74b1be;
+}
+
+.w-8 {
+    /* 32px */
+    width: 2rem;
 }

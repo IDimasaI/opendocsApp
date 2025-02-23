@@ -15,6 +15,14 @@ export function closeWindow() {
     window.electronAPI.closeWindow();
 }
 
+export function hideWindow() {
+    window.electronAPI.hideWindow();
+}
+
+export function maximizeUnmaximizeWindow() {
+    window.electronAPI.maximizeUnmaximizeWindow();
+}
+
 export function OpenFolder_Dialog() {
     return window.electronAPI.OpenFolder_Dialog();
 }

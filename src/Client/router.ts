@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createMemoryHistory } from 'vue-router';
 import HomeView from './Pages/index.vue';
 declare module 'vue-router' {
     interface RouteMeta {
@@ -6,7 +6,7 @@ declare module 'vue-router' {
     }
 }
 const router = createRouter({
-    history: createWebHistory('/'),
+    history: createMemoryHistory(),
     routes: [
         {
             path: '/',
@@ -14,7 +14,7 @@ const router = createRouter({
             meta: {
                 title: 'Home'
             },
-            component: () =>  import('./Pages/index.vue') // Оберните import в функцию, чтобы вернуть обещание
+            component: () => import('./Pages/index.vue') // Оберните import в функцию, чтобы вернуть обещание
         },
         {
             path: '/about',

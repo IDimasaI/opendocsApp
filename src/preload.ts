@@ -6,6 +6,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
     closeWindow: () => {
         ipcRenderer.send('close-window');
     },
+    hideWindow: () => {
+        ipcRenderer.send('hide-window');
+    },
+    maximizeUnmaximizeWindow: () => {
+        ipcRenderer.send('maximize/unmaximize-window');
+    },
     createFile: (filename: string, text: any) => { return ipcRenderer.invoke('create-file', filename, text) },
     OpenFolder_Dialog: () => { return ipcRenderer.invoke('OpenFolder_Dialog', true) },
     OpenExternalFile: (filename: string, path: string) => { return ipcRenderer.invoke('OpenExternalFile', filename, path) },

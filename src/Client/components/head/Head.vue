@@ -1,9 +1,61 @@
-<script lang="ts" setup>
-import { createApp, defineComponent } from 'vue';
-import head from './_headTemplate.vue'
-import router from '../../router';
-import '../../../assets/css/TitleBar.css'
-createApp(head).use(router).mount('#Header_nav');
-</script>
 <template>
+  <div>
+    <ResizablePanel>
+      <section id="top">
+        <div class="no-drag text-center">
+          <div style="height: 32px; width: 100%;" class="grid grid-cols-3 gap-2 justify-items-center buttonsContainer">
+            <button @click="hideWindow" class="w-8 rounded-md">
+              <svg width="16" height="16" style="margin: auto;" viewBox="0 0 16 16" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <line x1="2" y1="12.5" x2="14" y2="12.5" stroke="white" />
+              </svg>
+            </button>
+            <button @click="maximizeUnmaximizeWindow" class="w-8 rounded-md">
+              <svg width="16" height="16" style="margin: auto;" viewBox="0 0 16 16" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <rect x="3.5" y="3.5" width="9" height="9" stroke="white" />
+              </svg>
+            </button>
+            <button @click="closeWindow" class="hover:bg-red-700 w-8 rounded-md">
+              <svg width="16" height="16" style="margin: auto;" viewBox="0 0 16 16" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <line x1="1.66214" y1="13.6314" x2="13.6621" y2="2.63142" stroke="white" />
+                <line y1="-0.5" x2="16.2788" y2="-0.5" transform="matrix(-0.737154 -0.675725 -0.675725 0.737154 14 14)"
+                  stroke="white" />
+              </svg>
+            </button>
+          </div>
+          <button
+            @click="config.position == 'left' ? config.position = 'right' : config.position = 'left'">Клик</button>
+          <p class="bg-gray-500 max-w-md w-auto mx-auto rounded-md border border-black" style="min-width: fit-content;"
+            :title="`${history.getCurrent().value}`">
+            {{ history.getCurrent() }}</p>
+        </div>
+      </section>
+      <section id="bottom">
+        <div class="no-drag text-center">
+          <button @click="" id="settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+              <circle cx="12" cy="12" r="3" />
+            </svg>
+          </button>
+        </div>
+      </section>
+    </ResizablePanel>
+  </div>
 </template>
+<script lang="ts" setup>
+import ResizablePanel from '../ResizablePanel.vue';
+import { useConfig } from '../../composable/Stores';
+import { closeWindow, maximizeUnmaximizeWindow, hideWindow } from '../../electronAPI';
+import './../../../assets/css/TitleBar.css'
+import { useHistory } from '../../composable/history';
+const config = useConfig();
+const history = useHistory();
+console.log(config);
+
+
+</script>
