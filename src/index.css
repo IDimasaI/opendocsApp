@@ -19,7 +19,7 @@ body {
   --zoom-factor: 1;
 }
 
-.status_bar {
+#status_bar {
   position: absolute;
   bottom: 0;
   left: 0;

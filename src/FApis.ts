@@ -50,7 +50,7 @@ export async function OpenFolder_Dialog(): Promise<{ canceled: boolean; path: st
                 dir[i] = `${dir[i]}/`;
             }
         }
-
+        console.log(dir);
         return { canceled, path: filePaths[0].normalize().replace(/\\/g, '/'), dir };
     }
 

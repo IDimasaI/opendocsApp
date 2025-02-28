@@ -58,7 +58,7 @@ export const useStatusBar = (trigers: Ref<any>[], searchInDomId: string): void =
 
     const updateListeners = async () => {
         await nextTick();
-        const newElement = document.getElementById(searchInDomId);
+        const newElement = document.getElementById(searchInDomId) || null;
 
         // Если элемент изменился или был удален
         if (element !== newElement) {
@@ -75,9 +75,7 @@ export const useStatusBar = (trigers: Ref<any>[], searchInDomId: string): void =
     if (element) {
         addListeners(element);
     } else {
-        for (let i = 0; i < 10; i++) {
-            console.error(`StatusBar .Element ${searchInDomId} not found. Данный хук вызывается только после монтирования компонента`);
-        }
+        console.error(`StatusBar .Element ${searchInDomId} not found. Данный хук вызывается только после монтирования компонента`);
         return;
     }
 

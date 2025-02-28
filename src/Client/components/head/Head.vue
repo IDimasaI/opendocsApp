@@ -29,6 +29,9 @@
           <p class="bg-gray-500 max-w-md w-full mx-auto rounded-md border border-black" style="min-width: fit-content;"
             :title="`${history.getCurrent().value}`">
             {{ history.getCurrent() }}</p>
+          <div class="flex flex-col gap-2" id="outer-content">
+            <!--Не менять! Это на новый год(для <Teleport> тегов)-->
+          </div>
           <Transition>
             <section id="open_settings" v-if="open_settings.open" class="gap-2 flex flex-col">
               <h4 class="text-lg cursor-pointer" style="user-select: none;"

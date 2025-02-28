@@ -1,26 +1,29 @@
 <template>
-    <div class="flex flex-row text-left">
-        
-        
+    <div class="flex flex-row text-left" style="min-height: 100vh;">
+        <Teleport to="#outer-content" :defer="true">
+            <div>
+                <button @click="getManifestDocsInApi">Open Folder</button>
+            </div>
+        </Teleport>
         <div class="flex flex-col items-start w-64">
             <template v-for="file in files">
                 <button @click="getDocsInApi(file.url)" :style="`${CurrentPath === file.url ? 'color: red' : ''}`">{{
                     file.title }}</button>
             </template>
         </div>
-        <section>
-            <div v-html="openedFile.data" id="Docs_panel"></div>
+        <section class="bg-gray-600">
+            <div  v-html="openedFile.data" id="Docs_panel"></div>
         </section>
     </div>
 </template>
 <script lang="ts" setup>
-import { nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue'
-import { OpenFolder_Dialog } from '../electronAPI';
+import {  onMounted, onUnmounted, onUpdated, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 import MarkdownParser from '../utils/MarkdownParser';
 import '../../assets/css/Doc.css'
 import { useStatusBar } from '../utils/status_bar_content';
-import Title from '../components/head/Title.vue';
+
+import { addListenerHistory_Mouse } from '../composable/history';
 const parser = new MarkdownParser({
     tags: {},
     sanitize: true
@@ -51,7 +54,7 @@ const getDocsInApi = async (path?: string, firstLoad?: boolean) => {
     console.log(openedFile.value);
     CurrentPath.value = path;
 
-    await router.push(path);
+
     if (document.title !== `Docs - ${openedFile.value.name}`) document.title = `Docs - ${openedFile.value.name}`
 }
 

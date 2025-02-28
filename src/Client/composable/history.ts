@@ -12,7 +12,9 @@ export const addListenerHistory_Mouse = () => {
     const route = useRouter();
     const history = useHistory();
     onMounted(async () => {
+        route.push(history.getCurrent().value);
         const handleMouseBackForward = async (event: MouseEvent) => {
+            event.preventDefault();
             if (event.button === 4) {
                 event.preventDefault();
                 history.forward(route);
@@ -45,11 +47,11 @@ export async function navigate(route: Router, delta: number): Promise<string> {
 
 export default {
     install: (app: any) => {
-        if (!window.sessionStorage.getItem('history') || true) {
+        if (!window.sessionStorage.getItem('history')) {
             window.sessionStorage.setItem('history', JSON.stringify(['/']));
             window.sessionStorage.setItem('current', '0');
         }
-
+       
         class History {
             private history: string[];
             private current: Ref<string>;
