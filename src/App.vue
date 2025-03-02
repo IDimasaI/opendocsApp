@@ -1,7 +1,6 @@
 <template>
     <section>
         <Teleport :to="`#${config.position}_side`">
-
             <Head v-show="show_panel" />
         </Teleport>
         <main>
