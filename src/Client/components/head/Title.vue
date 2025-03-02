@@ -1,5 +1,5 @@
 <template>
-    <Teleport to="#Header_nav-center-content" defer>
+    <Teleport to="#Header_nav-center-content">
         <span>
             <slot></slot>
         </span>

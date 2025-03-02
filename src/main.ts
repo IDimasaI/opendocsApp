@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
-import { createFile, OpenExternalFile, OpenFolder_Dialog } from './FApis';
+import { createFile, OpenExternalFile, OpenExternalUrl, OpenFolder_Dialog } from './FApis';
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
@@ -52,12 +52,12 @@ function ipcMainHandlers() {
   ipcMain.on('close-window', () => { app.quit() });
   ipcMain.on('hide-window', () => { BrowserWindow.getFocusedWindow()?.minimize() });
   ipcMain.on('maximize/unmaximize-window', () => { BrowserWindow.getFocusedWindow()?.isMaximized() ? BrowserWindow.getFocusedWindow()?.unmaximize() : BrowserWindow.getFocusedWindow()?.maximize(); });
-
-
+  
   // Асинхронные события, возвращают промис
   ipcMain.handle('OpenFolder_Dialog', (event) => { return OpenFolder_Dialog() });
   ipcMain.handle('create-file', (event, filename, text) => { return createFile(filename, text) });
   ipcMain.handle('OpenExternalFile', (event, filename, path) => { return OpenExternalFile(filename, path) });
+  ipcMain.handle('OpenExternalUrl', (event, url) => { return OpenExternalUrl(url) });
 }
 
 // Запуск функций когда приложение готово

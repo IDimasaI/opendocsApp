@@ -60,3 +60,10 @@ export async function OpenExternalFile(filename: string, path: string): Promise<
     const filePath = `${path}/${filename}`;
     return fs.readFileSync(filePath, 'utf-8');
 }
+
+export async function OpenExternalUrl(url: string) {
+    const { shell } = require('electron')
+    shell.openExternal(url).then(() => {
+        console.log(`redirect to ${url} in browser`);
+    }).catch(err => console.log(err));
+}

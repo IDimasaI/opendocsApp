@@ -30,3 +30,7 @@ export function OpenFolder_Dialog() {
 export function OpenExternalFile(filename: string, path: string) {
     return window.electronAPI.OpenExternalFile(filename, path);
 }
+
+export function OpenExternalUrl(url: string) {
+    return window.electronAPI.OpenExternalUrl(url);
+}

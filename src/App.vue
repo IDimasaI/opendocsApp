@@ -11,16 +11,17 @@
 </template>
 
 <script lang="ts" setup>
-import { RouterLink, RouterView, useRouter } from 'vue-router'
+import { RouterView } from 'vue-router'
 import Head from './Client/components/head/Head.vue'
 import { useConfig } from './Client/composable/Stores';
-import { onMounted, onUnmounted, ref, watch } from 'vue';
-import { addListenerHistory_Mouse, useHistory } from './Client/composable/history';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { addListenerHistory_Mouse, } from './Client/composable/history';
 const config = useConfig();
+
 const show_panel = ref(config.value.baseOpen);
 addListenerHistory_Mouse();
 const heandlerPanel = () => {
-    if(show_panel.value == true) return
+    if (show_panel.value == true) return
     const center = document.getElementById('app');
     center.style.width = 'calc(100% - 100px)';
     show_panel.value = true

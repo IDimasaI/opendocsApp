@@ -15,4 +15,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     createFile: (filename: string, text: any) => { return ipcRenderer.invoke('create-file', filename, text) },
     OpenFolder_Dialog: () => { return ipcRenderer.invoke('OpenFolder_Dialog', true) },
     OpenExternalFile: (filename: string, path: string) => { return ipcRenderer.invoke('OpenExternalFile', filename, path) },
+    OpenExternalUrl: (url: string) => { return ipcRenderer.invoke('OpenExternalUrl', url) },
 });

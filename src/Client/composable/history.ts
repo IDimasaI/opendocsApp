@@ -6,13 +6,18 @@ export const useHistory = () => inject<{
     getCurrent: () => Ref<string>,
     back: (route: Router) => Promise<void>,
     forward: (route: Router) => Promise<void>,
+    forgetAllAfterCurrent: () => void
 }>('history');
 
+// Инициализация навигации в самом главном компоненте.
 export const addListenerHistory_Mouse = () => {
     const route = useRouter();
     const history = useHistory();
+
+    route.push(history.getCurrent().value);
+    history.forgetAllAfterCurrent();
+    console.log('addListenerHistory_Mouse run');
     onMounted(async () => {
-        route.push(history.getCurrent().value);
         const handleMouseBackForward = async (event: MouseEvent) => {
             event.preventDefault();
             if (event.button === 4) {
@@ -24,6 +29,7 @@ export const addListenerHistory_Mouse = () => {
                 history.back(route);
             }
         }
+
         window.addEventListener('mousedown', handleMouseBackForward);
         onUnmounted(() => {
             window.removeEventListener('mousedown', handleMouseBackForward);
@@ -31,7 +37,7 @@ export const addListenerHistory_Mouse = () => {
     });
 }
 
-export async function navigate(route: Router, delta: number): Promise<string> {
+export async function navigate(route: Router, delta: number): Promise<[string, number]> {
     const history: string[] = JSON.parse(window.sessionStorage.getItem('history') || '[]');
     let current = JSON.parse(window.sessionStorage.getItem('current') || '0');
 
@@ -42,7 +48,10 @@ export async function navigate(route: Router, delta: number): Promise<string> {
         await route.push(history[current]);
     }
 
-    return history[current];
+    return [
+        history[current],
+        current
+    ];
 }
 
 export default {
@@ -51,33 +60,46 @@ export default {
             window.sessionStorage.setItem('history', JSON.stringify(['/']));
             window.sessionStorage.setItem('current', '0');
         }
-       
+
         class History {
             private history: string[];
-            private current: Ref<string>;
+            private currentUrl: Ref<string>;
+            private currentIndex: number;
 
             constructor() {
                 this.history = JSON.parse(window.sessionStorage.getItem('history') || '[]');
-                this.current = ref(this.history[JSON.parse(window.sessionStorage.getItem('current') || '0')]);
+                this.currentUrl = ref(this.history[JSON.parse(window.sessionStorage.getItem('current') || '0')]);
+                this.currentIndex = JSON.parse(window.sessionStorage.getItem('current') || '0');
             }
 
             push(url: string): void {
+                if(this.history[this.history.length - 1] === url) {
+                    return;
+                }
                 this.history.push(url);
                 window.sessionStorage.setItem('history', JSON.stringify(this.history));
                 window.sessionStorage.setItem('current', `${this.history.length - 1}`);
-                this.current.value = url;
+                this.currentIndex = this.history.length - 1;
+                this.currentUrl.value = url;
             }
 
             getCurrent(): Ref<string> {
-                return this.current;
+                return this.currentUrl;
             }
 
             async back(route: Router): Promise<void> {
-                this.current.value = await navigate(route, -1);
+                [this.currentUrl.value, this.currentIndex] = await navigate(route, -1);
             }
 
             async forward(route: Router): Promise<void> {
-                this.current.value = await navigate(route, 1);
+                [this.currentUrl.value, this.currentIndex] = await navigate(route, 1);
+            }
+
+            forgetAllAfterCurrent(): void {
+                //const currentIndex = JSON.parse(window.sessionStorage.getItem('current') || '0');
+                //this.history = this.history.slice(0, currentIndex + 1);
+                //window.sessionStorage.setItem('history', JSON.stringify(this.history.splice(0, currentIndex + 1)));
+                //window.sessionStorage.setItem('history', JSON.stringify(this.history));
             }
         }
 

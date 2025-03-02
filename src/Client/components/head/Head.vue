@@ -26,9 +26,24 @@
               </svg>
             </button>
           </div>
-          <p class="bg-gray-500 max-w-md w-full mx-auto rounded-md border border-black" style="min-width: fit-content;"
-            :title="`${history.getCurrent().value}`">
+          <p class="bg-gray-500 max-w-md w-full mx-auto rounded-md border border-black"
+            style="overflow: hidden; text-overflow: ellipsis;" :title="`${history.getCurrent().value}`">
             {{ history.getCurrent() }}</p>
+          <section id="adds_tabs" class="flex flex-col gap-2">
+            <h4 class="text-lg cursor-pointer" style="user-select: none;" @click="open_tabs = !open_tabs">Вкладки</h4>
+            <Transition>
+              <div v-if="open_tabs" style="border-bottom: 1px solid white;">
+                <div>
+                  <button @click="addTabs()">Добавить вкладку</button>
+                </div>
+                <div class="flex flex-col gap-2" style="max-height: 210px; overflow-y: auto;">
+                  <template v-for="tab in tabs" :key="tab.name">
+                    <RouterLink :to="tab.url" @click="history.push(tab.url)">{{ tab.name }}</RouterLink>
+                  </template>
+                </div>
+              </div>
+            </Transition>
+          </section>
           <div class="flex flex-col gap-2" id="outer-content">
             <!--Не менять! Это на новый год(для <Teleport> тегов)-->
           </div>
@@ -46,6 +61,10 @@
                   <button @click="config.baseOpen = !config.baseOpen">
                     Начальное состояние: {{ config.baseOpen ? 'открыто' : 'закрыто' }}
                   </button>
+                  <button
+                    @click="config.Base_operating_mode = config.Base_operating_mode == 'online' ? 'offline' : 'online'">
+                    Режим работы: {{ config.Base_operating_mode == 'online' ? 'Онлайн' : 'Офлайн' }}
+                  </button>
                 </div>
               </TransitionGroup>
             </section>
@@ -53,35 +72,50 @@
         </div>
       </section>
       <section id="bottom">
-        <div class="no-drag text-center">
+        <div class="no-drag justify-items-center grid grid-cols-3 gap-2 mb-2 mx-auto" style="max-width: 300px;">
+          <button @click="networkStatus ? OpenExternalUrl('http://doc/') : null">
+            <component :is="networkStatus ? NetworkOnline : NetworkOffline" />
+          </button>
           <button @click="open_settings.open = !open_settings.open" id="settings"
             :style="{ transform: `rotate(${open_settings.open ? 90 : 0}deg)`, transition: 'transform 0.3s ease-in-out' }">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-              <path
-                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
+            <Settings />
           </button>
+          <div>d</div>
         </div>
       </section>
     </ResizablePanel>
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, Transition, TransitionGroup } from 'vue';
+import { computed, ref, Transition, TransitionGroup } from 'vue';
+import { useRouter } from 'vue-router';
+import Settings from '../../../assets/svg/settings.vue';
+import NetworkOffline from '../../../assets/svg/networkOffline.vue';
+import NetworkOnline from '../../../assets/svg/networkOnline.vue';
 import ResizablePanel from '../ResizablePanel.vue';
 import { useConfig } from '../../composable/Stores';
-import { closeWindow, maximizeUnmaximizeWindow, hideWindow } from '../../electronAPI';
+import { closeWindow, maximizeUnmaximizeWindow, hideWindow, OpenExternalUrl } from '../../electronAPI';
 import './../../../assets/css/TitleBar.css'
 import { useHistory } from '../../composable/history';
+import { useNetworkStatus } from '../../composable/hooks';
+import { LocalStorage } from '../../utils/localStorage';
 const config = useConfig();
 const history = useHistory();
 const open_settings = ref({
   open: false,
   current: ''
 });
-console.log(config);
+const open_tabs = ref(false);
+const { isOnline } = useNetworkStatus();
+const networkStatus = computed(() => isOnline.value ? 'networkOnline' : 'networkOffline');
+const router = useRouter();
 
+const tabs = ref<{ name: string, url: string }[]>(LocalStorage.get<{ name: string, url: string }[]>('tabs') || []);
+const addTabs = () => {
+  const tab = { name: router.currentRoute.value.meta.title !== '' ? router.currentRoute.value.meta.title : history.getCurrent().value.split('/').pop(), url: history.getCurrent().value };
+  tabs.value.push(tab);
+  console.log(tabs.value);
+  LocalStorage.push('tabs', tab);
+}
 
 </script>

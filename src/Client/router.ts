@@ -1,4 +1,4 @@
-import { createRouter, createMemoryHistory } from 'vue-router';
+import { createRouter, createMemoryHistory, HistoryState } from 'vue-router';
 import HomeView from './Pages/index.vue';
 declare module 'vue-router' {
     interface RouteMeta {
@@ -30,9 +30,18 @@ const router = createRouter({
             meta: {
                 title: 'Docs'
             },
+            children: [
+                {
+                    path: '/Docs/:page?',
+                    name: 'Docs/page',
+                    meta: {
+                        title: ''
+                    },
+                    component: () => import('./Pages/docs.vue') // Оберните import в функцию, чтобы вернуть обещание
+                }
+            ],
             component: () => import('./Pages/docs.vue')
         }
     ]
 });
-
 export default router;
