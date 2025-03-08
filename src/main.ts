@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
-import { createFile, OpenExternalFile, OpenExternalUrl, OpenFolder_Dialog } from './FApis';
+import { createFile, GetDocs, GetManifest, OpenExternalFile, OpenExternalUrl, OpenFolder_Dialog } from './FApis';
+import { i } from 'vite/dist/node/types.d-aGj9QkWt';
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   app.quit();
@@ -13,9 +14,9 @@ const createWindow = () => {
     height: 600,
     frame: false,
     show: true,
-    titleBarOverlay:false,
+    titleBarOverlay: false,
 
-    ...(process.platform !== 'darwin' ? { } : {}),
+    ...(process.platform !== 'darwin' ? {} : {}),
 
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -23,7 +24,7 @@ const createWindow = () => {
     },
   });
 
-  
+
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
@@ -49,28 +50,34 @@ const createWindow = () => {
 // Регистация обработчиков для моста контекстов
 function ipcMainHandlers() {
   // Однонаправленные события, ничего не возвращают
-  ipcMain.on('close-window', () => { app.quit() });
-  ipcMain.on('hide-window', () => { BrowserWindow.getFocusedWindow()?.minimize() });
+  ipcMain.on('close-window', () => {
+    app.quit()
+  });
+  ipcMain.on('hide-window', () => { 
+    BrowserWindow.getFocusedWindow()?.minimize() });
   ipcMain.on('maximize/unmaximize-window', () => { BrowserWindow.getFocusedWindow()?.isMaximized() ? BrowserWindow.getFocusedWindow()?.unmaximize() : BrowserWindow.getFocusedWindow()?.maximize(); });
-  
+
   // Асинхронные события, возвращают промис
   ipcMain.handle('OpenFolder_Dialog', (event) => { return OpenFolder_Dialog() });
   ipcMain.handle('create-file', (event, filename, text) => { return createFile(filename, text) });
   ipcMain.handle('OpenExternalFile', (event, filename, path) => { return OpenExternalFile(filename, path) });
   ipcMain.handle('OpenExternalUrl', (event, url) => { return OpenExternalUrl(url) });
+  ipcMain.handle('GetDocs', (event, name, isOnline) => { return GetDocs(name, isOnline) });
+  ipcMain.handle('GetManifest', (event) => { return GetManifest() });
 }
+
+Menu.setApplicationMenu(null);
 
 // Запуск функций когда приложение готово
 app.whenReady().then(() => {
   const { session } = require('electron');
-
   session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
     details.responseHeaders['Access-Control-Allow-Origin'] = ['*'];
     callback({ responseHeaders: details.responseHeaders });
   });
   createWindow();
   ipcMainHandlers();
-  
+
 });
 
 

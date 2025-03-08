@@ -34,3 +34,11 @@ export function OpenExternalFile(filename: string, path: string) {
 export function OpenExternalUrl(url: string) {
     return window.electronAPI.OpenExternalUrl(url);
 }
+
+export function GetDocs(name: string, isOnline: boolean) {
+    return window.electronAPI.GetDocs(name, isOnline);
+}
+
+export function GetManifest() {
+    return window.electronAPI.GetManifest();
+}

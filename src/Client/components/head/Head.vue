@@ -27,7 +27,7 @@
             </button>
           </div>
           <p class="bg-gray-500 max-w-md w-full mx-auto rounded-md border border-black"
-            style="overflow: hidden; text-overflow: ellipsis;" :title="`${history.getCurrent().value}`">
+            style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" :title="`${history.getCurrent().value}`">
             {{ history.getCurrent() }}</p>
           <section id="adds_tabs" class="flex flex-col gap-2">
             <h4 class="text-lg cursor-pointer" style="user-select: none;" @click="open_tabs = !open_tabs">Вкладки</h4>
@@ -73,8 +73,8 @@
       </section>
       <section id="bottom">
         <div class="no-drag justify-items-center grid grid-cols-3 gap-2 mb-2 mx-auto" style="max-width: 300px;">
-          <button @click="networkStatus ? OpenExternalUrl('http://doc/') : null">
-            <component :is="networkStatus ? NetworkOnline : NetworkOffline" />
+          <button @click="isOnline ? OpenExternalUrl('http://doc/') : null">
+            <component :is="isOnline ? NetworkOnline : NetworkOffline" />
           </button>
           <button @click="open_settings.open = !open_settings.open" id="settings"
             :style="{ transform: `rotate(${open_settings.open ? 90 : 0}deg)`, transition: 'transform 0.3s ease-in-out' }">
@@ -107,7 +107,6 @@ const open_settings = ref({
 });
 const open_tabs = ref(false);
 const { isOnline } = useNetworkStatus();
-const networkStatus = computed(() => isOnline.value ? 'networkOnline' : 'networkOffline');
 const router = useRouter();
 
 const tabs = ref<{ name: string, url: string }[]>(LocalStorage.get<{ name: string, url: string }[]>('tabs') || []);

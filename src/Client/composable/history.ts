@@ -1,6 +1,14 @@
 import { inject, onMounted, onUnmounted, provide, ref, Ref } from 'vue';
 import { type Router, useRouter } from 'vue-router';
 
+export type HistoryType = {
+    push: (path: string) => void,
+    getCurrent: () => Ref<string>,
+    back: (route: Router) => Promise<void>,
+    forward: (route: Router) => Promise<void>,
+    forgetAllAfterCurrent: () => void
+};
+
 export const useHistory = () => inject<{
     push: (path: string) => void,
     getCurrent: () => Ref<string>,
@@ -15,7 +23,6 @@ export const addListenerHistory_Mouse = () => {
     const history = useHistory();
 
     route.push(history.getCurrent().value);
-    history.forgetAllAfterCurrent();
     console.log('addListenerHistory_Mouse run');
     onMounted(async () => {
         const handleMouseBackForward = async (event: MouseEvent) => {
@@ -73,9 +80,11 @@ export default {
             }
 
             push(url: string): void {
-                if(this.history[this.history.length - 1] === url) {
+                if (this.history[this.currentIndex] === url) {
+                    console.log('push same url');
                     return;
                 }
+                this.history = this.history.slice(0, this.currentIndex + 1);
                 this.history.push(url);
                 window.sessionStorage.setItem('history', JSON.stringify(this.history));
                 window.sessionStorage.setItem('current', `${this.history.length - 1}`);

@@ -78,6 +78,22 @@ export namespace LocalStorage {
             }
             localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), expire, value }));
         }
+
+        static updateTimestamp(key: string, expire?: number): void {
+            const newTimeExpire = expire;
+            const value = localStorage.getItem(key);
+            if (value) {
+                const storedValue: { timestamp: number, expire: number, value: any } = JSON.parse(value);
+                const newTimestamp = Date.now();
+                const newExpire = expire !== undefined ? expire : storedValue.expire;
+    
+                localStorage.setItem(key, JSON.stringify({
+                    timestamp: newTimestamp,
+                    expire: newExpire,
+                    value: storedValue.value
+                }));
+            }
+        }
     }
 
 }

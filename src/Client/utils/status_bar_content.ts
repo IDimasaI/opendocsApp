@@ -57,9 +57,9 @@ export const useStatusBar = (trigers: Ref<any>[], searchInDomId: string): void =
     let element: HTMLElement | null = null;
 
     const updateListeners = async () => {
+        closeUrlTitle();
         await nextTick();
         const newElement = document.getElementById(searchInDomId) || null;
-
         // Если элемент изменился или был удален
         if (element !== newElement) {
             removeListeners(element); // Удаляем слушатели со старого элемента

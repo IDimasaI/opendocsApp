@@ -1,8 +1,9 @@
 import fs from 'fs';
+import fsP from 'fs/promises';
 import path from 'path';
 import type { IElectronAPI } from './IElectronAPI';
-const getFilePath = (filename: string) => path.join('resources', filename);
-
+import { app } from 'electron';
+import { DocsManager } from './Server/FApis/DocsManager';
 /**
  * 
  * @param filename Название файла
@@ -12,17 +13,8 @@ const getFilePath = (filename: string) => path.join('resources', filename);
  * createFile('Doc/test.txt', 'Hello World!')
  * @description Файлы создаются в ресурсах
  */
-export function createFile(filename: string, text: string): 'ok' | 'error' {
-    try {
-        const filePath = getFilePath(filename);
-        fs.mkdirSync(path.dirname(filePath), { recursive: true });
-        fs.writeFileSync(filePath, text);
-    } catch (error) {
-        console.log(error);
-        return 'error';
-    }
-    return 'ok';
-}
+
+
 
 /**
  * Функиця выходит до корня диска и просматиривает что там есть node
@@ -66,4 +58,51 @@ export async function OpenExternalUrl(url: string) {
     shell.openExternal(url).then(() => {
         console.log(`redirect to ${url} in browser`);
     }).catch(err => console.log(err));
+}
+
+
+const getFilePath = (filename: string) => path.join('resources', filename);
+async function ensureResourcesDirExists(name: string): Promise<void> {
+    try {
+        await fsP.access(getFilePath(name));
+    } catch {
+        await fsP.mkdir(getFilePath(name), { recursive: true });
+    }
+}
+
+export async function createFile(filePath: string, data: string): Promise<void> {
+    await ensureResourcesDirExists(filePath);
+    await fsP.writeFile(filePath, data, 'utf-8');
+}
+
+
+// Основная функция для получения содержимого документа
+export async function GetDocs(name: string, isOnline: boolean): Promise<string> {
+    const shortName = name.split('/').pop();
+    const docsManager = new DocsManager({
+        cacheDurationMs: 1000 * 60 * 60, // 1 час
+        baseUrl: 'https://open-docs-web.vercel.app/api/v1/Docs/getDocs',
+        cacheCleanupThresholdMs: 0,
+    });
+    let content = '';
+    try {
+        const { data, message } = await docsManager.getDocs(name, `resources/Docs/${shortName}.md`, isOnline);
+        console.log(message);
+        content = data;
+    } catch (error) {
+        console.error('Failed to load document:', error);
+    }
+
+    return content;
+}
+
+export async function GetManifest() {
+    const docsManager = new DocsManager({
+        cacheDurationMs: 1000 * 60 * 60, // 1 час
+        baseUrl: 'https://open-docs-web.vercel.app/api/v1/Docs/getManifest',
+        cacheCleanupThresholdMs: 0,
+    });
+    const { data, message } = await docsManager.getManifest();
+    console.log(message);
+    return data;
 }
