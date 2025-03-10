@@ -1,12 +1,12 @@
 import { app, BrowserWindow, ipcMain, Menu, MenuItem } from 'electron';
 import path from 'path';
-import started from 'electron-squirrel-startup';
+//import started from 'electron-squirrel-startup';
 import { createFile, GetDocs, GetManifest, OpenExternalFile, OpenExternalUrl, OpenFolder_Dialog } from './FApis';
-import { i } from 'vite/dist/node/types.d-aGj9QkWt';
-// Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (started) {
-  app.quit();
-}
+
+//Включать только при сборке с помощью белки( Electron Squirrel Startup )
+//if (started) {
+//  app.quit();
+//}
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -53,8 +53,9 @@ function ipcMainHandlers() {
   ipcMain.on('close-window', () => {
     app.quit()
   });
-  ipcMain.on('hide-window', () => { 
-    BrowserWindow.getFocusedWindow()?.minimize() });
+  ipcMain.on('hide-window', () => {
+    BrowserWindow.getFocusedWindow()?.minimize()
+  });
   ipcMain.on('maximize/unmaximize-window', () => { BrowserWindow.getFocusedWindow()?.isMaximized() ? BrowserWindow.getFocusedWindow()?.unmaximize() : BrowserWindow.getFocusedWindow()?.maximize(); });
 
   // Асинхронные события, возвращают промис

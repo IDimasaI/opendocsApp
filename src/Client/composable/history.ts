@@ -3,18 +3,22 @@ import { type Router, useRouter } from 'vue-router';
 
 export type HistoryType = {
     push: (path: string) => void,
+    no_push: (path: string) => void,
     getCurrent: () => Ref<string>,
     back: (route: Router) => Promise<void>,
     forward: (route: Router) => Promise<void>,
-    forgetAllAfterCurrent: () => void
+    forgetAllAfterCurrent: () => void,
+    getAllHistory: () => Ref<string[]>,
 };
 
 export const useHistory = () => inject<{
     push: (path: string) => void,
+    no_push: (path: string) => void,
     getCurrent: () => Ref<string>,
     back: (route: Router) => Promise<void>,
     forward: (route: Router) => Promise<void>,
-    forgetAllAfterCurrent: () => void
+    forgetAllAfterCurrent: () => void,
+    getAllHistory: () => Ref<string[]>,
 }>('history');
 
 // Инициализация навигации в самом главном компоненте.
@@ -26,17 +30,15 @@ export const addListenerHistory_Mouse = () => {
     console.log('addListenerHistory_Mouse run');
     onMounted(async () => {
         const handleMouseBackForward = async (event: MouseEvent) => {
-            event.preventDefault();
             if (event.button === 4) {
                 event.preventDefault();
-                history.forward(route);
+                await history.forward(route);
             }
             if (event.button === 3) {
                 event.preventDefault();
-                history.back(route);
+                await history.back(route);
             }
         }
-
         window.addEventListener('mousedown', handleMouseBackForward);
         onUnmounted(() => {
             window.removeEventListener('mousedown', handleMouseBackForward);
@@ -69,26 +71,36 @@ export default {
         }
 
         class History {
-            private history: string[];
+            private history: Ref<string[]>;
             private currentUrl: Ref<string>;
             private currentIndex: number;
 
             constructor() {
-                this.history = JSON.parse(window.sessionStorage.getItem('history') || '[]');
-                this.currentUrl = ref(this.history[JSON.parse(window.sessionStorage.getItem('current') || '0')]);
+                this.history = ref(JSON.parse(window.sessionStorage.getItem('history') || '[]'));
+                this.currentUrl = ref(this.history.value[JSON.parse(window.sessionStorage.getItem('current') || '0')]);
                 this.currentIndex = JSON.parse(window.sessionStorage.getItem('current') || '0');
             }
 
             push(url: string): void {
-                if (this.history[this.currentIndex] === url) {
+                if (this.history.value[this.currentIndex] === url) {
                     console.log('push same url');
                     return;
                 }
-                this.history = this.history.slice(0, this.currentIndex + 1);
-                this.history.push(url);
-                window.sessionStorage.setItem('history', JSON.stringify(this.history));
-                window.sessionStorage.setItem('current', `${this.history.length - 1}`);
-                this.currentIndex = this.history.length - 1;
+                this.history.value = this.history.value.slice(0, this.currentIndex + 1);
+                this.history.value.push(url);
+                window.sessionStorage.setItem('history', JSON.stringify(this.history.value));
+                window.sessionStorage.setItem('current', `${this.history.value.length - 1}`);
+                this.currentIndex = this.history.value.length - 1;
+                this.currentUrl.value = url;
+            }
+
+            no_push(url: string): void {
+                if (this.history.value[this.currentIndex] === url) {
+                    console.log('push same url');
+                    return;
+                }
+                this.currentIndex = this.history.value.indexOf(url);
+                window.sessionStorage.setItem('current', `${this.currentIndex}`);
                 this.currentUrl.value = url;
             }
 
@@ -110,6 +122,11 @@ export default {
                 //window.sessionStorage.setItem('history', JSON.stringify(this.history.splice(0, currentIndex + 1)));
                 //window.sessionStorage.setItem('history', JSON.stringify(this.history));
             }
+
+            getAllHistory(): Ref<string[]> {
+                return this.history;
+            }
+
         }
 
         app.provide('history', new History());

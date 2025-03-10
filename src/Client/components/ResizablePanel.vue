@@ -18,7 +18,7 @@ const isRight = ref(true);
 const panelWidth = ref(200);
 
 // Min and max width constraints
-const minWidth = 100;
+const minWidth = 124;
 const maxWidth = ref(500);
 
 // Resize state
@@ -31,7 +31,7 @@ let startWidth = 0;
 
 // Update max width on window resize
 const updateMaxWidth = () => {
-    maxWidth.value = window.innerWidth - 100;
+    maxWidth.value = window.innerWidth - 124;
 };
 
 // Resize handler

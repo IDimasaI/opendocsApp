@@ -5,14 +5,13 @@
 
             </Teleport>
         </div>
-        <div class="w-64">
+        <div class="w-64 " style="min-width: fit-content;">
             <template v-if="files" v-for="group in Object.keys(files)" :key="group">
                 <h3 v-if="group !== ''" class="text-white text-sm font-medium border-b border-gray-500 p-1"
                     style="user-select: none;">{{ group }}</h3>
                 <template v-for="file in files[group]" :key="file">
                     <ul className="list-none text-white text-sm font-medium contents">
-                        <RouterLink :to="file.url"
-                            :class="`flex items-center ${focus(`${file.url}`)}`">
+                        <RouterLink :to="file.url" :class="`flex items-center ${focus(`${file.url}`)}`">
                             <span v-if="file?.subDocs?.length" className="h-4 w-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
                                     viewBox="0 0 24 24" stroke="white">
@@ -23,14 +22,13 @@
                             </span>
                             {{ file.title }}
                         </RouterLink>
-                        <details class=" border-l-8 border-gray-500" v-if="file?.subDocs?.length"
+                        <details class="border-l-8 border-gray-500" v-if="file?.subDocs?.length"
                             :open="CurrentPath.startsWith(file.url)">
                             <summary className="list-none none"></summary>
                             <ul className="grid grid-cols-1">
                                 <template v-for="subDocs in file?.subDocs">
                                     <li class="list-none text-white text-sm font-medium contents">
-                                        <RouterLink :to="subDocs.url"
-                                            :class="focus(subDocs.url)">
+                                        <RouterLink :to="subDocs.url" :class="focus(subDocs.url)">
                                             {{ subDocs.title }}
                                         </RouterLink>
                                     </li>
@@ -41,22 +39,31 @@
                 </template>
             </template>
         </div>
-        <section class="bg-gray-600 text-white w-full" @click="handleClick">
-            <div v-html="openedFile.data" id="Docs_panel"></div>
+        <section class="bg-gray-600 text-white w-full flex flex-row" @click="handleClick">
+            <div class="w-full" @change="() => { console.log(1) }">
+                <div v-html="openedFile.data" id="Docs_panel"></div>
+            </div>
+            <!--<div v-if="openedFile.topic && openedFile.topic[0] !=='none'" class="flex flex-col text-center" style="width: 20%; max-width: fit-content;" id="topics">
+                <template  v-for="topic in openedFile.topic" :key="topic">
+                    <RouterLink :to="`/Docs/${topic.replace(/\s/, '')}`">{{ topic }}</RouterLink>
+                </template>
+            </div>
+            <div id="resizer_offset" style="width: 4px;"></div>-->
         </section>
     </div>
 </template>
+<style scoped></style>
 <script lang="ts" setup>
 import RouterLink from '../components/RouterLink.vue';
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router';
 import MarkdownParser from '../utils/MarkdownParser';
-import '../../assets/css/Doc.css'
 import { useStatusBar } from '../utils/status_bar_content';
 import { useHistory } from '../composable/history';
 import { LocalStorage } from '../utils/localStorage';
 import { GetDocs, GetManifest, OpenExternalUrl } from '../electronAPI';
 import isEqual from '../utils/isEqual';
+import '../../assets/css/Doc.css';
 import { useNetworkStatus } from '../composable/hooks';
 
 const parser = new MarkdownParser({
@@ -64,7 +71,7 @@ const parser = new MarkdownParser({
     sanitize: true
 });
 const files = ref<{ [key: string]: { title: string, url: string, tag: string, subDocs?: Doc[] }[] }>({});
-const openedFile = ref({ data: '', name: '' });
+const openedFile = ref({ data: '', name: '', topic: [] });
 const route = useRoute();
 const history = useHistory();
 
@@ -77,11 +84,14 @@ const focus = computed(() => (key: string) => {
     return CurrentPath.value == key ? 'bg-blue-300/50 p-1 sm:rounded-r-full' : 'p-1 hover:bg-gray-300/50 sm:hover:rounded-r-full'
 })
 
-watch(CurrentHistoryPath, async (path: string) => {
-    await getDocsInApi(path);
-}, { deep: true });
+
 
 onMounted(async () => {
+    watch(CurrentHistoryPath, async (path: string) => {
+        if (path.includes('Docs')) {
+            await getDocsInApi(path);
+        }
+    }, { deep: true });
     getDocsInApi(route.path, true);
     useStatusBar([openedFile], 'Docs_panel');
 });
@@ -94,7 +104,12 @@ const handleClick = (event: MouseEvent) => {
             OpenExternalUrl(target.href);
             return;
         }
-        let url = new URL(target.href).pathname;
+        let url
+        if (target.href.startsWith('http://localhost')) {
+            url = new URL(target.href).pathname;
+        } else {
+            url = target.href.replace(/^file:\/\/\/(.*)\:\//, '/');
+        }
         if (!url.startsWith('/Docs')) {
             url = `/Docs${url}`;
         }
@@ -127,19 +142,23 @@ const getDocsInApi = async (path?: string, firstLoad?: boolean) => {
     if (cacheDocs.has(path)) {
         const cache = JSON.parse(cacheDocs.get(path));
         if (cache.expired > Date.now()) {
-            const { data, name } = cache;
-            openedFile.value = { data, name };
+            const { data, topic, name } = cache;
+            openedFile.value = { data, name, topic };
             CurrentPath.value = path;
         } else {
             cacheDocs.delete(path);
             return getDocsInApi(path, firstLoad);
         }
     } else {
-        const data = await GetDocs(path, isOnline.value);
+        let data = await GetDocs(path, isOnline.value);
+        data = data.replace(/related_topics\s\=\s\"(.*)\"/g, (match: string, p1: string) => {
+            openedFile.value.topic = p1.split(',');
+            return ''
+        })
         openedFile.value.data = parser.parse(data);
         openedFile.value.name = path.split('/').pop();
         CurrentPath.value = path;
-        cacheDocs.set(path, JSON.stringify({ data: openedFile.value.data, name: openedFile.value.name, expired: Date.now() + CacheExpired }));// 1 hour
+        cacheDocs.set(path, JSON.stringify({ data: openedFile.value.data, topic: openedFile.value.topic, name: openedFile.value.name, expired: Date.now() + CacheExpired }));// 1 hour
     }
 
     if (document.title !== `Docs - ${openedFile.value.name}`) document.title = `Docs - ${openedFile.value.name}`

@@ -14,11 +14,16 @@ const config: ForgeConfig = {
   },
   hooks: {
     postPackage: async () => {
-      fs.writeFileSync('out/opendocs-win32-x64/resources/test.txt', '');
+      
     }
   },
   rebuildConfig: {},
-  makers: [new MakerSquirrel({}), new MakerZIP({}, ['darwin']), new MakerRpm({}), new MakerDeb({})],
+  makers: [
+    //new MakerSquirrel({}),
+    new MakerZIP({}, ['win32']),
+    new MakerRpm({}),
+    new MakerDeb({})
+  ],
   plugins: [
     new VitePlugin({
       // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
@@ -54,7 +59,7 @@ const config: ForgeConfig = {
       [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
-  ],
+  ]
 };
 
 export default config;

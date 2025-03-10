@@ -6,7 +6,7 @@ let closeTimeout: number | undefined;
 const openUrlTitle = (event: Event) => {
     const statusBar = document.getElementById('status_bar');
     if (statusBar && event.target instanceof HTMLAnchorElement) {
-        statusBar.textContent = event.target.href;
+        statusBar.textContent = event.target.href.replace(/^file:\/\/\/(.*)\:\//,'/');
         statusBar.style.opacity = '1';
         if (closeTimeout) {
             clearTimeout(closeTimeout);

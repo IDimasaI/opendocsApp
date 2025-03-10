@@ -22,7 +22,7 @@ addListenerHistory_Mouse();
 const heandlerPanel = () => {
     if (show_panel.value == true) return
     const center = document.getElementById('app');
-    center.style.width = 'calc(100% - 100px)';
+    center.style.width = 'calc(100% - 124px)';
     show_panel.value = true
 }
 onMounted(() => {
@@ -34,7 +34,7 @@ onMounted(() => {
     const observer = new MutationObserver(() => {
         if (resizable_panel.style.width !== old_width) {
             old_width = resizable_panel.style.width;
-            if (old_width == '100px' && show_panel.value == true) {
+            if (old_width == '124px' && show_panel.value == true) {
                 show_panel.value = false
                 center.style.width = 'calc(100% - 0px)';
             } else {

@@ -42,34 +42,33 @@ class DocsManager {
                 if (Date.now() - mtime < this.cacheDurationMs) {
                     return { data: await this.openFile(filePath), message: 'Using cached data' };
                 }
-            } else {
-                let data
-                try {
-                    // Загрузка данных из сети
-                    data = await this.netResponse(name, `name=${name.split('/').pop().toLocaleLowerCase()}`,isOnlite);
+            }
+            let data
+            try {
+                // Загрузка данных из сети
+                data = await this.netResponse(name, `name=${name.split('/').pop().toLocaleLowerCase()}`);
+                // Сохранение данных на диск
+                const dataTrimmed = data.replace(/[\s\f\n\r]+/g, '').replace(/[\u0000-\u001F]+/g, '');
+                if (dataTrimmed.length > 0) {
+                    await this.createFile(filePath, data);
+                }
+                // Очистка старых файлов кэша
+                if (this.cacheCleanupThresholdMs > 0) {
+                    await this.cleanupOldCache(filePath);
+                }
 
-                    // Сохранение данных на диск
-                    const dataTrimmed = data.replace(/[\s\f\n\r]+/g, '').replace(/[\u0000-\u001F]+/g, '');
-                    if (dataTrimmed.length > 0) {
-                        await this.createFile(filePath, data);
+                return { data, message: 'Success get new docs' };
+            } catch (error) {
+                if (await this.fileExists(filePath)) {
+                    return {
+                        data: await this.openFile(filePath),
+                        message: `Network response failed: ${error.message}; Using cached data`,
                     }
-                    // Очистка старых файлов кэша
-                    if (this.cacheCleanupThresholdMs > 0) {
-                        await this.cleanupOldCache(filePath);
-                    }
-
-                    return { data, message: 'Success get new docs' };
-                } catch (error) {
-                    if (await this.fileExists(filePath)) {
-                        return {
-                            data: await this.openFile(filePath),
-                            message: `Network response failed: ${error.message}; Using cached data`,
-                        }
-                    }else{
-                        return { data: '', message: `Network response failed: ${error.message}; File not found; return string empty` };
-                    }
+                } else {
+                    return { data: '', message: `Network response failed: ${error.message}; File not found; return string empty` };
                 }
             }
+
         } catch (error) {
             return { data: '', message: `Failed to load document: ${error.message}` };
         }
@@ -127,10 +126,7 @@ class DocsManager {
     /**
      * Выполняет сетевой запрос для получения данных.
      */
-    private async netResponse(name: string, params?: string, isOnlite?: boolean): Promise<string | any> {
-        if(isOnlite == false){
-            throw new Error('You offline');
-        }
+    private async netResponse(name: string, params?: string): Promise<string | any> {
         const { net } = require('electron');
         //Берем документы.
         let url = `${this.baseUrl}`
@@ -149,7 +145,6 @@ class DocsManager {
         try {
             const res = await net.fetch(url, {
                 method: 'GET',
-                cache: 'no-cache',
                 signal: controller.signal,
             });
 
